@@ -32,6 +32,17 @@ Then install it with the converted `deb` package.
 Note that the specific file names may be different.
 
 
-## Have an issue 
+## Have a very terrible issue 
 
 Have to reinstall before using sometimes.
+
+## Install by source code
+
+In addition, on my own ubuntu, successfully installed the sextor through the source code. Here are some useful links:
+
+    https://www.astr.tohoku.ac.jp/~akhlaghi/sextractor_install.html
+    http://wiki.ipb.ac.rs/index.php/SExtractor_installation
+    https://sextractor.readthedocs.io/en/latest/index.html#
+    https://www.cnblogs.com/qujingtongxiao/p/9951774.html
+    https://obiwant.wordpress.com/2014/02/17/quick-installation-of-source-extractor-on-linux-pc/
+    
