@@ -10,7 +10,7 @@
 \usepackage[normalem]{ulem}
 \usepackage{wrapfig}
 \usepackage[font=small]{caption}
-\usepackage{ listings} 
+\usepackage{listings} 
 \usepackage{verbatim}
 \lstset{
     %backgroundcolor=\color{red!50!green!50!blue!50},%代码块背景色为浅灰色
@@ -23,6 +23,32 @@
     frame=shadowbox%用方框框住代码块
     }
 
+\lstset{
+    basicstyle          =   \sffamily,          % 基本代码风格
+    keywordstyle        =   \bfseries,          % 关键字风格
+    commentstyle        =   \rmfamily\itshape,  % 注释的风格，斜体
+    stringstyle         =   \ttfamily,  % 字符串风格
+    flexiblecolumns,                % 别问为什么，加上这个
+    numbers             =   left,   % 行号的位置在左边
+    showspaces          =   false,  % 是否显示空格，显示了有点乱，所以不现实了
+    numberstyle         =   \zihao{-5}\ttfamily,    % 行号的样式，小五号，tt等宽字体
+    showstringspaces    =   false,
+    captionpos          =   t,      % 这段代码的名字所呈现的位置，t指的是top上面
+    frame               =   lrtb,   % 显示边框
+}
+
+\lstdefinestyle{Python}{
+    language        =   Python, % 语言选Python
+    basicstyle      =   \zihao{-5}\ttfamily,
+    numberstyle     =   \zihao{-5}\ttfamily,
+    keywordstyle    =   \color{blue},
+    keywordstyle    =   [2] \color{teal},
+    stringstyle     =   \color{magenta},
+    commentstyle    =   \color{red}\ttfamily,
+    breaklines      =   true,   % 自动换行，建议不要写太长的行
+    columns         =   fixed,  % 如果不加这一句，字间距就不固定，很丑，必须加
+    basewidth       =   0.5em,
+}
 %页边距
 \geometry{left=2.0cm,right=2.0cm,top=2.0cm,bottom=2.0cm}
 
@@ -107,6 +133,151 @@
 几乎所有我们能接受到的来自太阳系外的信息都是以电磁辐射（EMR）的形式。
 
 
+\section{IRAF}
+\subsection{简介}
+IRAF是通用的图像reduction和analysis工具，可为用户提供广泛的图像处理工具。 IRAF是National Optical Astronomy Observatories（NOAO）的产品，是为天文界开发的，其他科学领域的研究人员也发现IRAF对于一般图像处理很有用。本文档旨在为新手用户提供IRAF及其命令语言（CL）用户界面的简要介绍。
+
+在本文中仅讨论IRAF的“核心”系统。IRAF是NOAO系列科学软件其中的一个（general spectroscopic and photometric reduction and analysis tools），对其他软件的讨论可以在其他地方得到更好的介绍。
+
+IRAF核心系统使用命令行界面为用户提供了广泛的图像处理工具选择。通过执行其中的命令，我们称为tasks，以执行各种功能。每个task都有一个parameter file，用户可以修改该parameter file，调整task的输出。该系统的重点包括：
+\begin{itemize}
+	\item 无论主机系统如何，都具有相似的环境
+	\item query and command line interface
+	\item pipes and redirection
+	\item background job queue
+	\item extensive online help
+	\item interactive graphics and image display
+	\item text and graphics hardcopy
+	\item tape I/O
+	\item several user programming environments
+	\item world coordinate systems
+\end{itemize}
+
+其他IRAF软件packages（称为layered packages）可从多种来源获得，并且可以安装以在IRAF环境下运行。有关更多信息，请参见附录F。
+
+\subsection{开始}
+运行IRAF所需的主机级别文件会有所不同，具体取决于您打算在其中执行IRAF的主机和窗口环境。工作站环境（SunView，OpenWindows，DECwindows，X Windows）将需要比常规图形终端环境所使用的主机级文件更多的文件。在工作站环境中使用的主机级别文件的讨论不在本文档的讨论范围之内。所有UNIX用户都需要确保其UNIX主目录中的.login或.cshrc文件都包含目录的“路径”，该目录包含在IRAF安装时定义的IRAF启动命令。 “路径”语句可能类似下面这样：
+
+\begin{lstlisting}
+set path = (. /local/bin /usr/ucb /bin /usr/bin /usr/local/bin)
+\end{lstlisting}
+
+在常规图形终端环境中，VMS / IRAF不需要特殊的主机级文件.
+
+每个用户在首次登录IRAF之前必须在主机级别执行命令"mkiraf"。此任务必须在IRAF“登录”或“主”目录中执行，该目录不必与主机“登录”目录相同。您不必每次启动IRAF会话时都需要执行此操作-只需第一次，然后才建议您这样做（通常是在您的站点上安装了新版本的IRAF之后）。
+
+MKIRAF命令创建一个名为login.cl的文件（参见图1）和一个名为uparm的子目录。 login.cl文件在IRAF启动时执行，IRAF使用uparm子目录保存您的自定义参数文件（有关参数文件的更多信息，请参阅第3.5节）。 MKIRAF命令注意两件事：
+\begin{enumerate}
+	\item  如果您曾经已经做过MKIRAF，那么系统会询问您是否要“Initialize uparm”？除非您绝对确定自己知道自己在做什么，否则通常回答“否”。 IRAF的有用功能之一是，它通过将参数存储在uparm目录中来“学习”参数-初始化该目录会从字面上清除所有这些自定义参数文件！如果您在系统的全新安装后执行MKIRAF，我们建议您对这个问题回答“是”。
+	\item 现在将要求您“输入终端类型：”-在此处输入您的图形终端类型，即vt640，gterm，xterm等。参见§3.1.1有关设置终端类型的更多信息
+\end{enumerate}
+
+用户还可以创建一个loginuser.cl文件（参见图2），该文件将在启动时由login.cl文件（参见图1）执行。 loginuser.cl文件中的命令会取代login.cl文件中在调用loginuser.cl文件本身的语句之前执行的命令。 loginuser.cl文件不受新的MKIRAF的影响，因此该文件是自定义IRAF登录名的首选方法。关于此文件要注意的重要一点是，文件中的最后一个语句必须为keep.
+
+主机和IRAF级别的启动文件到位后，用户只需输入"cl"即可登录IRAF。重要的是，从IRAF的“登录”或“主”目录登录IRAF。此时，将执行login.cl文件（以及如果有的话，loginuser.cl文件）中的命令.
+
+如果从工作站环境中运行IRAF，则需要先启动窗口环境，然后在终端仿真器窗口（如gterm或xterm）中键入cl。
+
+通过键入"logout"来注销IRAF。如果您是从Windows环境中运行IRAF，则重要的是先logout IRAF，然后关闭Windows环境。这提供了从IRAF的干净退出，并允许系统有序地关闭。
+
+\subsection{基础}
+\subsubsection{设置IRAF环境}
+
+一旦用户登录IRAF，他可能想为该会话自定义其IRAF环境。在IRAF启动时，loginuser.cl文件也可以用于此目的（参见图2）。 IRAF CL维护一个“环境变量”表，该表会影响许多IRAF任务的运行。可以通过键入以下命令查看这些变量的完整列表（将SHOW的输出“通过管道输入”到PAGE命令的输入中，这是一次一次查看一页文本的简单任务。
+
+完整的列表有点让人不知所措，但是您可能需要修改这些变量中的一小部分以自定义IRAF环境。 SET或RESET命令可用于此目的.
+
+SET命令仅在加载当前程序包时临时修改变量（请参阅第3.2节中有关程序包的更多信息）。使用RESET通常会为当前IRAF会话的其余部分更改变量的值。
+
+IRAF环境变量也可以用于定义目录的IRAF逻辑名称。这些逻辑名可以是表示主机级别路径名或其他IRAF逻辑名的字符串。例如，在本文档的许多示例中使用的测试映像"dev \$ pix"可以通过SHOW task追溯到以下主机目录。每个安装的iraf逻辑目录都将是不同的主机级别路径名，但是所有主机上的dev逻辑目录都将相同。 IRAF逻辑目录后跟一个“ \$”。在最后一个示例中，任务PATH用于直接打印等效的主机路径名，包括节点或计算机名
+
+\subsubsection{Packages and tasks}
+The programs or commands that the user executes to perform specific functions are called
+tasks. Tasks that perform similar functions are grouped together into packages. The packages
+for the IRAF core system are listed below.
+
+A package must be loaded in order to execute a task that is in it. A package is loaded by
+simply typing its name or enough characters to uniquely identify its name, i.e., softools or
+so. Note that IRAF is case sensitive! The prompt reflects the current package (the last package
+loaded). The last package that was loaded can be unloaded by typing bye. What packages are
+currently loaded can be checked by typing package. Once a package is loaded its tasks are
+available for execution until the package is unloaded. Loading a new package does not unload
+the previous package. There is essentially no overhead in having a variety of packages loaded
+at the same time.
+
+\section{SExtrator}
+
+sextrator Double image mode下，选哪个做detect？
+
+The detection image will generally be chosen in the band where the data are the deepest. Alternatively, using a “$\chi^2$ image” as a detection image, will allow most of the sources present in at least one channel to be detected and measured.
+
+configuration file 的格式
+
+代码是ASCII格式的。每行一个参数。如下
+\begin{lstlisting}
+    Config-parameter    Value(s)
+\end{lstlisting}
+
+多余的空格和换行会被忽略掉。备注以\#开头，以回车结尾。Value(s)有多种类型：字符串（可以用双引号括起来）、浮点数、整数、关键词或者布尔数（Y/y,N/n）。有些参数可以接收0作为Value。有的参数还可以接受多个Values，多个Value之间必须以逗号隔开。整型可以以多种形式给出，如小数，八进制形式（以O开头）,十六进制形式（以0x开头）。十六进制格式对于编写复用位值(如二进制掩码)特别方便。以\$HOME或\$ \{HOME\}形式写入的环境变量将被展开。
+
+Configuration parameter list
+
+这里是SExtractor已知的所有配置参数的完整列表。
+
+The measurement (or catalog) parameter file
+
+除恶了configuratin file，SExtrator还要求一个写有要测量参数列表measurements
+(“catalog parameters”)的文件，相应的，每次detection都会输出catalog。这使得软件只会计算我们需要的measurements。catalog parameters file的名称一般以.param为后缀，必须使用PARAMETERS\_NAME配置参数来指定。完整的参数集可以使用下面的命令来查看。
+
+\begin{lstlisting}
+    sex -dp 
+\end{lstlisting}
+
+catalog parameters file的格式是ASCII，每行必须有一个keyword。目前SExtrator识别的关键词有两种:标量和向量。标量，如X\_IMAGE，在输出的cat文件中生成单个数字。向量，如MAG\_APER(4)或VIGNET(15,15)，生产数字数组。输出cat文件中的measurements的顺序与参数列表中的keywords的顺序相同。可以用\#开头进行注释。
+
+Variants
+
+对于一些catalog parameters，尤其那些和flux，position，或者shape有关的，有许多变体，如下：
+
+Fluxes \& magnitudes
+
+FLuxes可以表示成counts(ADU(Analog-to-Digital Unit)s)或者Pogson magnitudes.在ADUs中，Flux measurements 以FLUX\_ 为前缀，例如FLUX\_AUTO,FLUX\_ISO,等等。Magnitudes 以MAG\_为前缀，例如MAG\_AUTO, MAG\_ISO,\dots。MAG\_ZEROPOINT设定了magnitude 的zero-point:
+\begin{equation*}\mathrm{MAG}=\left\{\begin{array}{ll}
+    \mathrm{MAG}_{-} \mathrm{ZEROPOINT}-2.5 \log _{10} \mathrm{FLUX} & \text { if } \mathrm{FLUX}>0 \\
+    99.0 & \text { otherwise }
+    \end{array}\right.\end{equation*}
+
+Flux \& magnitude uncertainties
+
+Flux \& magnitude uncertainties (error estimates)的变体和Flux \& magnitude遵循相似的规则，以FLUXERR\_和MAGERR\_为前缀，例如FLUXERR\_AUTO,FLUXERR\_ISO ,MAGERR\_AUTO, MAGERR\_ISO。有以下计算公式：
+\begin{equation*}\mathrm{MAGERR}=\left\{\begin{array}{ll}
+    \frac{2.5}{\ln 10}(\mathrm{FLUXERR} / \mathrm{FLUX}) & \text { if } \mathrm{FLUX}>0 \\
+    99.0 & \text { otherwise }
+    \end{array}\right.\end{equation*}
+
+Pixel values and Surface brightnesses
+
+Pixel values (averaged or not) $p$ 被表示为counts（ADUs）.没有特别的统一前缀（THRESHOLD,
+BACKGROUND, FLUX\_MAX, etc.）Surface brightnesses 是magnitudes per square arcsecond.前缀是MU\_，例如MU\_THRESHOLD, MU\_MAX。Surface brightnesses的变换依赖于 MAG\_ZEROPOINT 和 PIXEL\_SCALE：
+\begin{equation*}\mathrm{MU}=\left\{\begin{array}{ll}
+    \mathrm{MAG}_{-} \mathrm{ZEROPOINT}-2.5 \log _{10}\left(p \times \mathrm{PIXEL}_{-} \mathrm{SCALE}^{2}\right) & \text { if } p>0 \\
+    99.0 & \text { otherwise }
+    \end{array}\right.\end{equation*}
+
+把PIXEL\_SCALE 设为0，会让SExtrator根据FITS图像header中的celestial WCS info(如果有的话)，从astrometric deprojection的local Jacobian计算pixel scale。
+
+Positions and shapes
+
+Positions,distances and position angles是在pixel coordinates中被计算的。它们可能被表示成image的pixels、world coordinates或者celestial coordinates，依赖于后缀：
+
+\begin{itemize}
+    \item \textbf{\_IMAGE}.Measurements将以pixel coordinates的形式给出，以pixels为单位。例如Y\_IMAGE, ERRAWIN\_IMAGE, THETA\_IMAGE.根据FITS约定，在SExtractor中第一个pixel的中心的坐标是（1.0，1.0），position angles从x轴到y轴逐渐增加。
+    \item \textbf{\_WORLD}.Measurements将以world coordinates的形式给出，它可以从pixel coordinates通过坐标系变换的Jacobian得到。它要求FITS的头文件里有WCS metadata.position angles从第一个world axis到第二个 world axis逐渐增加。
+    \item \textbf{\_SKY, \_J2000,\_B1950.}Measurements将以celestial（equatorial） coordinates的形式给出.Positions 和 distances以degrees为单位.要求FITS的头文件里有celestial WCS metadata。\_SKY的measurements是在native world coordinate system中给出的。\_J2000和\_B1950的measurements是自动考虑到参考系的变化，从本地WCS转换得到的。这三种情况下,positions angles are counted East-of-North.
+    \item \textbf{\_FOCAL}.Measurements将以focal plane coordinates的形式给出，这实际上是投影坐标系，以degrees为单位。也要求FITS的头文件里有WCS metadata。用pixel coordinates计算focal plane coordinates的方法与\_SKY坐标类似，只是它们不进行消投影(de-projected)，保持笛卡尔坐标。focal plane coordinates的主要作用是为镶嵌相机的所有芯片提供一个通用的系统。注意：只有少数的measurements可以用\_FOCAL.
+\end{itemize}
+
+Measurement parameter list
 
 
 

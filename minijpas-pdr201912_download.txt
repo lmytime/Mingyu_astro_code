@@ -1,0 +1,11 @@
+#############################################################
+## INSTRUCTIONS: 
+## Save this file in a known directory.
+## Open a console/terminal and go to the directory where you have saved this file.
+## Execute in the console/terminal the following line without the '#' (NOTE: If you have save this file with another name you must replace 'minijpas-pdr201912_download.txt' with the name you have put to this file): 
+# wget --no-check-certificate --content-disposition --user=caiz0528 --ask-password -i minijpas-pdr201912_download.txt
+##
+#############################################################
+http://archive.cefca.es/catalogues/vo/siap/minijpas-pdr201912/get_fits?id=2231
+http://archive.cefca.es/catalogues/vo/siap/minijpas-pdr201912/get_fits?id=2231
+
