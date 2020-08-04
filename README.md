@@ -1,3 +1,3 @@
 # Mingyu_astro_code
 
-    Some codes and some useful things I recorded while studying astronomical research
+    Some codes and some useful things while studying
